@@ -1,0 +1,4 @@
+pandas
+fuzzywuzzy
+python-Levenshtein
+mysql-connector-python
