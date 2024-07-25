@@ -17,7 +17,7 @@ def create_tables(cursor):
     # Create Episodes table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Episodes (
-        episode_id INT AUTO_INCREMENT PRIMARY KEY,
+        id INT PRIMARY KEY,
         painting_title VARCHAR(255),
         painting_index INT,
         season INT,
@@ -32,7 +32,7 @@ def create_tables(cursor):
     # Create Colors_Used table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Colors_Used (
-        episode_id INT,
+        id INT,
         painting_title VARCHAR(255),
         painting_index INT,
         Black_Gesso INT DEFAULT 0,
@@ -53,15 +53,15 @@ def create_tables(cursor):
         Van_Dyke_Brown INT DEFAULT 0,
         Yellow_Ochre INT DEFAULT 0,
         Alizarin_Crimson INT DEFAULT 0,
-        FOREIGN KEY (episode_id) REFERENCES Episodes(episode_id),
-        PRIMARY KEY (episode_id, painting_title, painting_index)
+        FOREIGN KEY (id) REFERENCES Episodes(id),
+        PRIMARY KEY (id, painting_title, painting_index)
     );
     """)
 
     # Create Subject_Matter table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Subject_Matter (
-        episode_id INT,
+        id INT,
         painting_title VARCHAR(255),
         painting_index INT,
         APPLE_FRAME INT DEFAULT 0,
@@ -131,8 +131,8 @@ def create_tables(cursor):
         WINDOW_FRAME INT DEFAULT 0,
         WINTER INT DEFAULT 0,
         WOOD_FRAMED INT DEFAULT 0,
-        FOREIGN KEY (episode_id) REFERENCES Episodes(episode_id),
-        PRIMARY KEY (episode_id, painting_title, painting_index)
+        FOREIGN KEY (id) REFERENCES Episodes(id),
+        PRIMARY KEY (id, painting_title, painting_index)
     );
     """)
 
@@ -151,19 +151,15 @@ def insert_data(file_path):
 
         df = pd.read_csv(file_path)
 
-        # Print the dataframe to ensure it is loaded correctly
-        print("DataFrame loaded:")
-        print(df.head())
-        print("Column names:", df.columns)
-
         for index, row in df.iterrows():
             # Insert data into Episodes
             episode_sql = """
                 INSERT INTO Episodes (
-                    painting_title, painting_index, season, episode, date, img_src, youtube_src, num_colors
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+                    id, painting_title, painting_index, season, episode, date, img_src, youtube_src, num_colors
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
             """
             episode_values = (
+                row['id'],
                 row['painting_title'],
                 row['painting_index'],
                 row['season'],
@@ -176,22 +172,21 @@ def insert_data(file_path):
             try:
                 cursor.execute(episode_sql, episode_values)
                 connection.commit()
-                episode_id = cursor.lastrowid
                 print(f"Inserting data into Episodes: {episode_values}")
             except mysql.connector.Error as err:
                 print(f"Episode insertion error: {err}")
-                continue  # Skip further processing for this row if there's an error
+                continue
 
             # Insert data into Colors_Used
             colors_sql = """
                 INSERT INTO Colors_Used (
-                    episode_id, painting_title, painting_index, Black_Gesso, Bright_Red, Burnt_Umber, Cadmium_Yellow, Dark_Sienna, 
+                    id, painting_title, painting_index, Black_Gesso, Bright_Red, Burnt_Umber, Cadmium_Yellow, Dark_Sienna, 
                     Indian_Red, Indian_Yellow, Liquid_Black, Liquid_Clear, Midnight_Black, Phthalo_Blue, Phthalo_Green, 
                     Prussian_Blue, Sap_Green, Titanium_White, Van_Dyke_Brown, Yellow_Ochre, Alizarin_Crimson
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
             """
             colors_values = (
-                episode_id,
+                row['id'],  # Use the same id as in Episodes
                 row['painting_title'],
                 row['painting_index'],
                 row.get('Black_Gesso', 0),
@@ -219,23 +214,27 @@ def insert_data(file_path):
                 print(f"Inserting data into Colors_Used: {colors_values}")
             except mysql.connector.Error as err:
                 print(f"Colors_Used insertion error: {err}")
+                continue
 
             # Insert data into Subject_Matter
             subjects_sql = """
                 INSERT INTO Subject_Matter (
-                    episode_id, painting_title, painting_index, APPLE_FRAME, AURORA_BOREALIS, BARN, BEACH, BOAT, BRIDGE, BUILDING,
-                    BUSHES, CABIN, CACTUS, CIRCLE_FRAME, CIRRUS, CLIFF, CLOUDS, CONIFER, CUMULUS, DECIDUOUS, DIANE_ANDRE, DOCK,
-                    DOUBLE_OVAL_FRAME, FARM, FENCE, FIRE, FLORIDA_FRAME, FLOWERS, FOG, FRAMED, GRASS, GUEST, HALF_CIRCLE_FRAME,
-                    HALF_OVAL_FRAME, HILLS, LAKE, LAKES, LIGHTHOUSE, MILL, MOON, MOUNTAIN, MOUNTAINS, NIGHT, OCEAN, OVAL_FRAME,
-                    PALM_TREES, PATH, PERSON, PORTRAIT, RECTANGLE_3D_FRAME, RECTANGULAR_FRAME, RIVER, ROCKS, SEASHELL_FRAME,
-                    SNOW, SNOWY_MOUNTAIN, SPLIT_FRAME, STEVE_ROSS, STRUCTURE, SUN, TOMB_FRAME, TREE, TREES, TRIPLE_FRAME,
-                    WATERFALL, WAVES, WINDMILL, WINDOW_FRAME, WINTER, WOOD_FRAMED
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    id, painting_title, painting_index, APPLE_FRAME, AURORA_BOREALIS, BARN, BEACH, BOAT, BRIDGE, 
+                    BUILDING, BUSHES, CABIN, CACTUS, CIRCLE_FRAME, CIRRUS, CLIFF, CLOUDS, CONIFER, CUMULUS, DECIDUOUS, 
+                    DIANE_ANDRE, DOCK, DOUBLE_OVAL_FRAME, FARM, FENCE, FIRE, FLORIDA_FRAME, FLOWERS, FOG, FRAMED, GRASS, 
+                    GUEST, HALF_CIRCLE_FRAME, HALF_OVAL_FRAME, HILLS, LAKE, LAKES, LIGHTHOUSE, MILL, MOON, MOUNTAIN, 
+                    MOUNTAINS, NIGHT, OCEAN, OVAL_FRAME, PALM_TREES, PATH, PERSON, PORTRAIT, RECTANGLE_3D_FRAME, 
+                    RECTANGULAR_FRAME, RIVER, ROCKS, SEASHELL_FRAME, SNOW, SNOWY_MOUNTAIN, SPLIT_FRAME, STEVE_ROSS, 
+                    STRUCTURE, SUN, TOMB_FRAME, TREE, TREES, TRIPLE_FRAME, WATERFALL, WAVES, WINDMILL, WINDOW_FRAME, 
+                    WINTER, WOOD_FRAMED
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                          );
             """
             subjects_values = (
-                episode_id,
+                row['id'],  # Use the same id as in Episodes
                 row['painting_title'],
                 row['painting_index'],
                 row.get('APPLE_FRAME', 0),
@@ -312,6 +311,7 @@ def insert_data(file_path):
                 print(f"Inserting data into Subject_Matter: {subjects_values}")
             except mysql.connector.Error as err:
                 print(f"Subject_Matter insertion error: {err}")
+                continue
 
     except mysql.connector.Error as err:
         print(f"Database connection error: {err}")
@@ -319,8 +319,7 @@ def insert_data(file_path):
         if connection.is_connected():
             cursor.close()
             connection.close()
+            print("MySQL connection is closed")
 
-
-if __name__ == "__main__":
-    # Update this path to the correct location of your CSV file
-    insert_data('Merged_Output.csv')
+file_path = 'Merged_Output.csv'
+insert_data(file_path)

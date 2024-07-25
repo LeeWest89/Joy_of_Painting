@@ -1,51 +1,3 @@
-# import pandas as pd
-# from fuzzywuzzy import process, fuzz
-
-# # Read CSV files
-# colors_used = pd.read_csv('Colors_Used.csv')
-# subject_matter = pd.read_csv('Subject_Matter.csv')
-# episode_dates = pd.read_csv('Episode_Dates.csv')
-
-# # Helper function for fuzzy matching
-# def fuzzy_merge(df_1, df_2, key1, key2, threshold=85, limit=1):
-#     """
-#     Fuzzy matching of two DataFrames on a given key.
-#     df_1: DataFrame 1
-#     df_2: DataFrame 2
-#     key1: key column of df_1
-#     key2: key column of df_2
-#     threshold: matching threshold
-#     limit: max number of matches
-#     """
-#     s = df_2[key2].tolist()
-#     matches = df_1[key1].apply(lambda x: process.extract(x, s, limit=limit, scorer=fuzz.token_set_ratio))
-    
-#     df_1['matches'] = matches
-#     df_1['best_match'] = df_1['matches'].apply(lambda x: x[0][0] if x and x[0][1] >= threshold else None)
-#     df_1['match_score'] = df_1['matches'].apply(lambda x: x[0][1] if x else 0)
-    
-#     return df_1.drop(columns=['matches'])
-
-# # Fuzzy merge Colors_Used with Subject_Matter
-# colors_used = fuzzy_merge(colors_used, subject_matter, 'painting_title', 'TITLE')
-
-# # Merge with Subject_Matter based on best matches
-# merged_df = colors_used.merge(subject_matter, left_on='best_match', right_on='TITLE', how='left', suffixes=('', '_subject'))
-
-# # Fuzzy merge the result with Episode_Dates
-# merged_df = fuzzy_merge(merged_df, episode_dates, 'painting_title', 'Episode_TITLE')
-
-# # Merge with Episode_Dates based on best matches
-# merged_df = merged_df.merge(episode_dates, left_on='best_match', right_on='Episode_TITLE', how='left', suffixes=('', '_episode'))
-
-# # Drop unnecessary columns, keep Episode_TITLE and drop painting_title
-# # merged_df = merged_df.drop(columns=['best_match', 'match_score'])
-# columns_to_keep = ['TITLE', 'painting_title', 'Episode_TITLE', 'DATE']
-# merged_df = merged_df[columns_to_keep]
-
-# # Save to new CSV
-# merged_df.to_csv('Merged_Output.csv', index=False)
-
 import pandas as pd
 from fuzzywuzzy import process, fuzz
 
@@ -129,9 +81,6 @@ merged_df = filter_season_duplicates(merged_df, 'painting_title', 'season')
 
 # Sort by season and episode
 merged_df = merged_df.sort_values(by=['season', 'episode']).reset_index(drop=True)
-
-# # Generate IDs based on the sorted order
-merged_df.insert(0, '', range(1, len(merged_df) + 1))
 
 # Drop specific unnecessary columns
 columns_to_drop = ['processed_painting_title', 'processed_TITLE', 'processed_Episode_TITLE']  # Add columns to drop if needed
