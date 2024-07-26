@@ -22,7 +22,9 @@ def create_tables(cursor):
         painting_index INT,
         season INT,
         episode INT,
-        date DATE,
+        month VARCHAR(20),
+        day INT,
+        year INT,
         img_src VARCHAR(255),
         youtube_src VARCHAR(255),
         num_colors INT
@@ -155,8 +157,8 @@ def insert_data(file_path):
             # Insert data into Episodes
             episode_sql = """
                 INSERT INTO Episodes (
-                    id, painting_title, painting_index, season, episode, date, img_src, youtube_src, num_colors
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    id, painting_title, painting_index, season, episode, Month, Day, Year, img_src, youtube_src, num_colors
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
             """
             episode_values = (
                 row['id'],
@@ -164,7 +166,9 @@ def insert_data(file_path):
                 row['painting_index'],
                 row['season'],
                 row['episode'],
-                pd.to_datetime(row['DATE']).strftime('%Y-%m-%d'),
+                row['Month'],
+                row['Day'],
+                row['Year'],
                 row['img_src'],
                 row['youtube_src'],
                 row['num_colors']
@@ -172,7 +176,6 @@ def insert_data(file_path):
             try:
                 cursor.execute(episode_sql, episode_values)
                 connection.commit()
-                print(f"Inserting data into Episodes: {episode_values}")
             except mysql.connector.Error as err:
                 print(f"Episode insertion error: {err}")
                 continue
@@ -211,7 +214,6 @@ def insert_data(file_path):
             try:
                 cursor.execute(colors_sql, colors_values)
                 connection.commit()
-                print(f"Inserting data into Colors_Used: {colors_values}")
             except mysql.connector.Error as err:
                 print(f"Colors_Used insertion error: {err}")
                 continue
@@ -308,7 +310,6 @@ def insert_data(file_path):
             try:
                 cursor.execute(subjects_sql, subjects_values)
                 connection.commit()
-                print(f"Inserting data into Subject_Matter: {subjects_values}")
             except mysql.connector.Error as err:
                 print(f"Subject_Matter insertion error: {err}")
                 continue
@@ -321,5 +322,5 @@ def insert_data(file_path):
             connection.close()
             print("MySQL connection is closed")
 
-file_path = 'Merged_Output.csv'
+file_path = 'csv/Merged_Output.csv'
 insert_data(file_path)

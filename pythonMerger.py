@@ -2,9 +2,9 @@ import pandas as pd
 from fuzzywuzzy import process, fuzz
 
 # Read CSV files
-colors_used = pd.read_csv('Colors_Used.csv')
-subject_matter = pd.read_csv('Subject_Matter.csv')
-episode_dates = pd.read_csv('Episode_Dates.csv')
+colors_used = pd.read_csv('csv/Colors_Used.csv')
+subject_matter = pd.read_csv('csv/Subject_Matter.csv')
+episode_dates = pd.read_csv('csv/Episode_Dates.csv')
 
 # Helper function to preprocess titles
 def preprocess_title(title):
@@ -87,6 +87,6 @@ columns_to_drop = ['processed_painting_title', 'processed_TITLE', 'processed_Epi
 merged_df = merged_df.drop(columns=columns_to_drop, errors='ignore')
 
 # Save to new CSV
-merged_df.to_csv('Merged_Output.csv', index=False, header=True)
+merged_df.to_csv('csv/Merged_Output.csv', index=False, header=True)
 
 print("Merged CSV with all relevant data created successfully.")
