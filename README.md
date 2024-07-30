@@ -108,9 +108,11 @@ curl "http://localhost:5000/episodes?month=januarY&colors=Bright_Red,cADMIUM_Yel
 
 To test in postman simple remove the curl and double quotes
 
-## Author
+## About the Author
 
-- **Lee West** : [LeeWest89](https://github.com/LeeWest89)
+Lee West is a Full Stack web developer passionate about creating beautiful, user-friendly websites. Over the past year, he has honed his skills in web development and teamwork. Lee is committed to continuously learning new technologies to advance his professional growth and make a significant impact in the tech industry.
+
+- **Lee West** : [Github](https://github.com/LeeWest89), [Personal Website](https://www.lee-west.com/)
 
 ## Connect with me
 
