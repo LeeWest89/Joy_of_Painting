@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+"""
+Functions to create tables in the database
+"""
+
+
 import mysql.connector
 import pandas as pd
 
@@ -8,13 +14,14 @@ db_config = {
     'database': 'JoyOfPaintingDB'
 }
 
+
 def create_tables(cursor):
-    # Drop tables if they exist
+    # drop tables if they exist
     cursor.execute("DROP TABLE IF EXISTS Colors_Used;")
     cursor.execute("DROP TABLE IF EXISTS Subject_Matter;")
     cursor.execute("DROP TABLE IF EXISTS Episodes;")
 
-    # Create Episodes table
+    # create Episodes table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Episodes (
         id INT PRIMARY KEY,
@@ -31,7 +38,7 @@ def create_tables(cursor):
     );
     """)
 
-    # Create Colors_Used table
+    # create Colors_Used table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Colors_Used (
         id INT,
@@ -60,7 +67,7 @@ def create_tables(cursor):
     );
     """)
 
-    # Create Subject_Matter table
+    # create Subject_Matter table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Subject_Matter (
         id INT,
@@ -138,6 +145,7 @@ def create_tables(cursor):
     );
     """)
 
+
 def insert_data(file_path):
     try:
         connection = mysql.connector.connect(
@@ -148,16 +156,26 @@ def insert_data(file_path):
         )
         cursor = connection.cursor()
 
-        # Create tables
+        # create tables
         create_tables(cursor)
 
         df = pd.read_csv(file_path)
 
         for index, row in df.iterrows():
-            # Insert data into Episodes
+            # insert data into Episodes
             episode_sql = """
                 INSERT INTO Episodes (
-                    id, painting_title, painting_index, season, episode, Month, Day, Year, img_src, youtube_src, num_colors
+                    id,
+                    painting_title,
+                    painting_index,
+                    season,
+                    episode,
+                    Month,
+                    Day,
+                    Year,
+                    img_src,
+                    youtube_src,
+                    num_colors
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
             """
             episode_values = (
@@ -176,17 +194,37 @@ def insert_data(file_path):
             try:
                 cursor.execute(episode_sql, episode_values)
                 connection.commit()
-            except mysql.connector.Error as err:
-                print(f"Episode insertion error: {err}")
+            except mysql.connector.Error as error:
+                print(f"Episode insertion error: {error}")
                 continue
 
-            # Insert data into Colors_Used
+            # insert data into Colors_Used
             colors_sql = """
                 INSERT INTO Colors_Used (
-                    id, painting_title, painting_index, Black_Gesso, Bright_Red, Burnt_Umber, Cadmium_Yellow, Dark_Sienna, 
-                    Indian_Red, Indian_Yellow, Liquid_Black, Liquid_Clear, Midnight_Black, Phthalo_Blue, Phthalo_Green, 
-                    Prussian_Blue, Sap_Green, Titanium_White, Van_Dyke_Brown, Yellow_Ochre, Alizarin_Crimson
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    id,
+                    painting_title,
+                    painting_index,
+                    Black_Gesso,
+                    Bright_Red,
+                    Burnt_Umber,
+                    Cadmium_Yellow,
+                    Dark_Sienna,
+                    Indian_Red,
+                    Indian_Yellow,
+                    Liquid_Black,
+                    Liquid_Clear,
+                    Midnight_Black,
+                    Phthalo_Blue,
+                    Phthalo_Green,
+                    Prussian_Blue,
+                    Sap_Green,
+                    Titanium_White,
+                    Van_Dyke_Brown,
+                    Yellow_Ochre,
+                    Alizarin_Crimson
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s);
             """
             colors_values = (
                 row['id'],  # Use the same id as in Episodes
@@ -214,24 +252,85 @@ def insert_data(file_path):
             try:
                 cursor.execute(colors_sql, colors_values)
                 connection.commit()
-            except mysql.connector.Error as err:
-                print(f"Colors_Used insertion error: {err}")
+            except mysql.connector.Error as error:
+                print(f"Colors_Used insertion error: {error}")
                 continue
 
-            # Insert data into Subject_Matter
+            # insert data into Subject_Matter
             subjects_sql = """
                 INSERT INTO Subject_Matter (
-                    id, painting_title, painting_index, APPLE_FRAME, AURORA_BOREALIS, BARN, BEACH, BOAT, BRIDGE, 
-                    BUILDING, BUSHES, CABIN, CACTUS, CIRCLE_FRAME, CIRRUS, CLIFF, CLOUDS, CONIFER, CUMULUS, DECIDUOUS, 
-                    DIANE_ANDRE, DOCK, DOUBLE_OVAL_FRAME, FARM, FENCE, FIRE, FLORIDA_FRAME, FLOWERS, FOG, FRAMED, GRASS, 
-                    GUEST, HALF_CIRCLE_FRAME, HALF_OVAL_FRAME, HILLS, LAKE, LAKES, LIGHTHOUSE, MILL, MOON, MOUNTAIN, 
-                    MOUNTAINS, NIGHT, OCEAN, OVAL_FRAME, PALM_TREES, PATH, PERSON, PORTRAIT, RECTANGLE_3D_FRAME, 
-                    RECTANGULAR_FRAME, RIVER, ROCKS, SEASHELL_FRAME, SNOW, SNOWY_MOUNTAIN, SPLIT_FRAME, STEVE_ROSS, 
-                    STRUCTURE, SUN, TOMB_FRAME, TREE, TREES, TRIPLE_FRAME, WATERFALL, WAVES, WINDMILL, WINDOW_FRAME, 
-                    WINTER, WOOD_FRAMED
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                    id, painting_title, painting_index,
+                    APPLE_FRAME,
+                    AURORA_BOREALIS,
+                    BARN,
+                    BEACH,
+                    BOAT,
+                    BRIDGE,
+                    BUILDING,
+                    BUSHES,
+                    CABIN,
+                    CACTUS,
+                    CIRCLE_FRAME,
+                    CIRRUS,
+                    CLIFF,
+                    CLOUDS,
+                    CONIFER,
+                    CUMULUS,
+                    DECIDUOUS,
+                    DIANE_ANDRE,
+                    DOCK,
+                    DOUBLE_OVAL_FRAME,
+                    FARM,
+                    FENCE,
+                    FIRE,
+                    FLORIDA_FRAME,
+                    FLOWERS,
+                    FOG,
+                    FRAMED,
+                    GRASS,
+                    GUEST,
+                    HALF_CIRCLE_FRAME,
+                    HALF_OVAL_FRAME,
+                    HILLS,
+                    LAKE,
+                    LAKES,
+                    LIGHTHOUSE,
+                    MILL,
+                    MOON,
+                    MOUNTAIN,
+                    MOUNTAINS,
+                    NIGHT,
+                    OCEAN,
+                    OVAL_FRAME,
+                    PALM_TREES,
+                    PATH,
+                    PERSON,
+                    PORTRAIT,
+                    RECTANGLE_3D_FRAME,
+                    RECTANGULAR_FRAME,
+                    RIVER, ROCKS,
+                    SEASHELL_FRAME,
+                    SNOW, SNOWY_MOUNTAIN,
+                    SPLIT_FRAME,
+                    STEVE_ROSS,
+                    STRUCTURE,
+                    SUN,
+                    TOMB_FRAME,
+                    TREE,
+                    TREES,
+                    TRIPLE_FRAME,
+                    WATERFALL,
+                    WAVES,
+                    WINDMILL,
+                    WINDOW_FRAME,
+                    WINTER,
+                    WOOD_FRAMED
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                          %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                           %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
                           );
             """
@@ -310,17 +409,18 @@ def insert_data(file_path):
             try:
                 cursor.execute(subjects_sql, subjects_values)
                 connection.commit()
-            except mysql.connector.Error as err:
-                print(f"Subject_Matter insertion error: {err}")
+            except mysql.connector.Error as error:
+                print(f"Subject_Matter insertion error: {error}")
                 continue
 
-    except mysql.connector.Error as err:
-        print(f"Database connection error: {err}")
+    except mysql.connector.Error as error:
+        print(f"Database connection error: {error}")
     finally:
         if connection.is_connected():
             cursor.close()
             connection.close()
             print("MySQL connection is closed")
+
 
 file_path = 'csv/Merged_Output.csv'
 insert_data(file_path)
