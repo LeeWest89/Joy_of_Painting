@@ -147,6 +147,7 @@ def create_tables(cursor):
 
 
 def insert_data(file_path):
+    # Creates table and inserts the data
     try:
         connection = mysql.connector.connect(
             host=db_config['host'],
@@ -227,7 +228,7 @@ def insert_data(file_path):
                           %s);
             """
             colors_values = (
-                row['id'],  # Use the same id as in Episodes
+                row['id'],
                 row['painting_title'],
                 row['painting_index'],
                 row.get('Black_Gesso', 0),
@@ -335,7 +336,7 @@ def insert_data(file_path):
                           );
             """
             subjects_values = (
-                row['id'],  # Use the same id as in Episodes
+                row['id'],
                 row['painting_title'],
                 row['painting_index'],
                 row.get('APPLE_FRAME', 0),

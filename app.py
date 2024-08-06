@@ -74,7 +74,7 @@ def get_episodes():
 
     if s_param:
         subjects = [subject.strip() for subject in s_param.split(',')]
-        # Fuzzy matching
+        # Fuzzy matching subjects
         matched_subjects = set()
         for subject in subjects:
             matched_subject = process.extractOne(subject, valid_subjects)[0]
@@ -94,7 +94,7 @@ def get_episodes():
 
     if c_param:
         colors = [color.strip() for color in c_param.split(',')]
-        # Fuzzy matching
+        # Fuzzy matching colors
         matched_colors = set()
         for color in colors:
             matched_color = process.extractOne(color, valid_colors)[0]

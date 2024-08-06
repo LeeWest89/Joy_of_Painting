@@ -129,7 +129,7 @@ columns_to_drop = ['processed_painting_title',
                    'processed_Episode_TITLE']
 merged_df = merged_df.drop(columns=columns_to_drop, errors='ignore')
 
-# Save to csv
+# save to csv
 merged_df.to_csv('csv/Merged_Output.csv', index=False, header=True)
 
 print("Merged csv created successfully.")

@@ -14,6 +14,7 @@ db_config = {
 
 
 def create_database():
+    # creates the database and drops it if already exist
     connection = None
     cursor = None
     try:
@@ -26,7 +27,7 @@ def create_database():
 
         cursor.execute("DROP DATABASE IF EXISTS JoyOfPaintingDB;")
         cursor.execute("CREATE DATABASE JoyOfPaintingDB;")
-        print("Database 'JoyOfPaintingDB' created successfully.")
+        print("JoyOfPaintingDB created successfully.")
 
     except Error as error:
         print(f"Error creating database: {error}")
