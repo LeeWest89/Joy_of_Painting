@@ -1,4 +1,4 @@
-import "@/app/global.css";
+// import "@/globals.css";
 import { inter } from "@/app/font";
 import { Metadata } from "next";
 
